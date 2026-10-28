@@ -1,24 +1,26 @@
-# Verification — 28 October 2026
+# Version 2 verification — 28 October 2026
 
-## Passed automated checks
+## Automated checks actually performed
 
-Run `npm test` (no install required; Node.js 20+). Catalog tests cover 18 unique records, case-insensitive names/developers/tags, multiword queries, category/type filters, name/added/updated sorting, curated and empty rating collections, invalid/missing IDs, minimal data, duplicate rejection, rating bounds, HTTPS URL validation, local asset existence, module imports, manifest icons, SW allowlist, persistent storage reload and blocked-storage fallback. All JS files also passed Node syntax checks.
+`npm test` passes four suites: catalog/search/sorting/assets/storage; service-worker lifecycle; download URL/filename validation; release generation. Syntax checks passed for application modules and boot.js.
 
-Service-worker lifecycle tests use a mock environment: shell precache, version cleanup, user-triggered activation, offline navigation fallback and exclusion of external URLs/APKs passed. These are logic checks, not a browser installability certification.
+- Relative APK paths at a root or subdirectory resolve correctly; HTTPS signed query strings stay intact; unsafe URLs rejected.
+- Server filenames, UTF-8 filenames, APK extensions and HTML response detection covered.
+- Mocked worker requests always use no-store; old JNR caches are removed without touching other caches; new workers activate; offline shell/module fallback works with version query strings. APK/unknown-page navigation is not intercepted. Real HTTP 404 responses are preserved.
+- Release integration test copies the project into a temporary directory, runs two unchanged releases (same hash), edits an app name, rebuilds and confirms the entry, import graph, HTML URLs and SW version all change together.
 
-## Passed browser checks
+## Browser checks actually performed
 
-- Desktop catalog visually inspected; hero, icons, featured carousel and navigation render.
-- Details opened for Bloom Focus with correct app information.
-- Saving Bloom Focus persisted across a page reload and appeared in Library.
-- Missing-download dialog clearly states sample app with no real download.
-- Search `pDf` returned JNR PDFs; Photography filter returned Frame Studio and Prism Camera.
-- Games returned four games. Browser Back restored the filtered search.
-- Mobile layouts visually inspected in 320px, 390px and 600px iframe viewports; main content scrollWidth matched rendered width at 320/390px, with no horizontal content overflow.
-- Mobile Games navigation and zero-result search were exercised.
-- Invalid app route showed a friendly not-found state.
-- Browser logs inspected: observed errors were from the browser extension, not JNR Store application source.
+- White-and-pink desktop design inspected. Android-width iframe layouts inspected at 320px and 390px. Main content scrollWidth matched visible width at both sizes.
+- New list/grid toggle, PDF search and download-link availability filter exercised.
+- Internal QA used a clearly labeled text fixture (not a fake APK). Relative-file transfer reached File received / Save request sent and produced a browser download event.
+- Missing file displayed a specific HTTP 404 message within the download sheet without routing to a catalog not-found page.
+- HTML source link was recognized as a webpage and offered the unchanged source address.
+- Application-origin browser error logs were empty in the inspected sample; the intentional missing-file HTTP request is expected.
+- Version 1 library storage remains unchanged; existing catalog/storage tests passed again.
 
-## Not verified
+## Remaining limits
 
-Real Android hardware, standalone PWA installation, real browser offline/service-worker update lifecycle, actual APK downloads, external publisher hosting, screen-reader audit and low-end-device performance. Preview used an HTTP test origin; secure-context installation must be tested on HTTPS or localhost. Shipped records have no real download URLs or ratings.
+Real Android hardware performance, native APK installation, CORS behavior of the user's actual provider and secure-origin worker migration were not verified in the HTTP preview. The user's failing publisher URL was not present in this checkout, so its host-side 404 is not diagnosed. Sample records still have no production download URLs. No Kotlin/native performance claim is made. Download animation uses actual transfer state; final filesystem save/installation is not observable by this app.
+
+Internal QA pages and fixtures were removed from the deliverable.

@@ -1,5 +1,5 @@
-import {apps as records} from '../data/apps.js';
-import {validateApps} from '../utils/validation.js';
+import {apps as records} from '../data/apps.js?v=244a87fd408bff07';
+import {validateApps} from '../utils/validation.js?v=244a87fd408bff07';
 export const apps=validateApps(records).sort((a,b)=>(a.order??999)-(b.order??999));
 export const getApp=id=>apps.find(a=>a.id===id);
 export const inCategory=(a,c)=>!c||a.category===c||a.categories.includes(c);

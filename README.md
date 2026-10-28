@@ -1,6 +1,6 @@
 # JNR Store
 
-A buildless, Android-first app discovery web app by JNR Corporations. HTML, CSS and vanilla ES modules; no runtime dependencies, account or backend.
+Version 2: a white-and-rose, Android-first app discovery web app by JNR Corporations. HTML, CSS and vanilla ES modules; no runtime dependencies, account or backend.
 
 ## Run locally
 
@@ -24,7 +24,11 @@ Add categories in `js/data/categories.js`; category name matches app `category` 
 
 ## Downloads
 
-Set `downloadUrl` to a real HTTPS URL for your APK, release page or distribution endpoint. Unsupported schemes and missing links display an unavailable dialog. `alternateDownloads: [{label:'Mirror',url:'https://…'}]` supplies alternatives. The confirmation names the destination; links open explicitly in a new tab with noopener/noreferrer. The app remembers link clicks, never claims download completion or APK installation. Serve APKs from your own correctly configured host; no hosting for APKs is included.
+`downloadUrl` now accepts HTTPS publisher links or local paths such as `downloads/my-app.apk`. Local paths resolve from the store directory, never the hash route. Put the actual APK at that location; matching filename case matters on Linux hosts. Root-relative paths (`/downloads/my-app.apk`) resolve at the domain root, so prefer `downloads/my-app.apk` for subdirectory hosting. `downloadFileName` overrides the saved filename; server Content-Disposition and APK content types are also handled. HTTPS signed query strings are preserved. Unsupported schemes, credentials in URLs and app hash routes are rejected.
+
+The Get button opens a pink download sheet with actual byte progress, an animated orbit, cancel, HTTP error diagnostics and a browser Save request after transfer. No simulated percentage or installation claims. Direct transfer requires same-origin access or publisher CORS permission; for external hosts that block CORS, use Open original source. HTML landing pages are identified and opened as pages rather than saved as APKs. The app does not rewrite Google Drive, GitHub or other publisher URLs. Expired/deleted/private files and incorrect server paths must be corrected at the source. A frontend cannot repair a remote 404.
+
+To protect mobile memory, files over 96 MiB use the original URL and browser download manager. APKs are never cached by the service worker. `alternateDownloads: [{label:'Mirror',url:'https://…'}]` adds source choices. Recent download history records save requests/source link clicks, not verified disk saves or installs. The shipped sample records still have no real APKs attached.
 
 ## Branding
 
@@ -32,15 +36,24 @@ Set `downloadUrl` to a real HTTPS URL for your APK, release page or distribution
 
 ## Deploy
 
-Upload this entire directory to Cloudflare Pages, GitHub Pages or another static host. No build command. For Vercel use the Other preset and serve this directory. Preserve relative file paths. Hash routing supports static hosting and subdirectories without rewrite rules. If deploying within a subdirectory, use that directory as the document root path; relative assets, manifest and service worker adapt automatically.
+Upload this entire directory to Cloudflare Pages, GitHub Pages or another static host. For versioned updates, run the lightweight release command documented below. For Vercel use the Other preset and serve this directory. Preserve relative file paths. Hash routing supports static hosting and subdirectories without rewrite rules. If deploying within a subdirectory, use that directory as the document root path; relative assets, manifest and service worker adapt automatically.
 
 Set the production origin in config, replace `example.invalid` in sitemap.xml, add a Sitemap directive in robots.txt and add canonical and og:url tags with your actual URL in index.html. No production domain, email or social account is invented. Hash app routes are not independently indexed; server-rendered route pages would be needed for per-app SEO.
 
-## PWA and updates
+## PWA and updates — version 2
 
-Manifest includes 192/512 PNG icons and standalone mode. Test on HTTPS or localhost: DevTools → Application → Manifest/Service Workers. In Android Chrome, use Install app/Add to home screen when offered; browser eligibility varies. After a first online visit and cache install, switch offline and reload to test the shell and local catalog. External downloads cannot work offline.
+Before deploying a new revision run:
 
-`sw.js` precaches a finite allowlist of the shell and bundled lightweight SVG art. Navigation and shell assets use network first with cached fallback. It never caches APKs, arbitrary downloads or external images. Change CACHE (`jnr-shell-v1` → v2) on each release and update SHELL if adding modules/assets. Old caches are removed on activation. A waiting worker prompts Update now; user action activates it and reloads. Network first avoids indefinitely stale data on online visits. Browser storage may be evicted.
+```sh
+python3 tools/release.py
+# or: npm run release
+```
+
+This uses Python's standard library, with no package installation. It computes a content hash, updates every ES-module import URL, CSS/boot URLs, release.json and the service-worker cache version automatically. You never need to manually edit a cache version. The script is idempotent for unchanged content. Run it after adding/editing apps or replacing assets, then deploy the whole folder together. In Cloudflare Pages set the build command to `python3 tools/release.py`; for a ZIP/manual deployment run it locally before upload. GitHub Pages supports the generated files directly. Vercel headers and a Cloudflare `_headers` file request browser revalidation; other hosts should send `Cache-Control: no-cache` for HTML, JS, CSS and `no-store` for sw.js/release.json.
+
+Online shell fetches use `cache: no-store`, bypassing browser HTTP caches; offline shell copies remain available. A new worker activates automatically and removes only old JNR shell caches, preserving bookmarks/history. Startup, online and tab-resume checks fetch release.json fresh; an open, visible page also checks every 60 seconds. A changed release reloads automatically, deferred while a dialog/download is open. Service-worker updates bypass HTTP cache and are explicitly checked on startup and resume. First migration from version 1 happens on the next online opening/reload. Users should not need to clear site storage. An upstream CDN forcibly serving old responses must be fixed in that host's caching configuration.
+
+Manifest includes 192/512 PNG icons and standalone mode. Installability requires HTTPS or localhost. Test in Android Chrome with Install app/Add to home screen and DevTools Application panel. Test offline after a successful online cache install. Only a finite app-shell allowlist is cached. External URLs, arbitrary files and APK navigation are never intercepted; missing APKs retain real 404 responses, not the app HTML. PWA installation, actual Android save dialogs and live worker migration still need secure-origin/device validation; automated lifecycle tests use mocks.
 
 ## Architecture
 

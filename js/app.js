@@ -1,17 +1,17 @@
-import {config} from './config.js';
-import {el,link,toast} from './utils/dom.js';
-import {safeURL} from './utils/validation.js';
-import {startRouter,route} from './router.js';
-import {renderHeader,renderNavigation} from './components/header.js';
-import {renderHome,renderCategorySections,sectionHeading} from './pages/home.js';
-import {renderSearch} from './components/search.js';
-import {renderLibrary} from './pages/library.js';
-import {renderAppDetails} from './pages/app-details.js';
-import {renderAppGrid} from './components/app-card.js';
-import {collections} from './data/collections.js';
-import {collectionApps,getApp} from './services/app-service.js';
-import {toggleBookmark,read} from './utils/storage.js';
-import {download} from './services/download-service.js';
+import {config} from './config.js?v=244a87fd408bff07';
+import {el,link,toast} from './utils/dom.js?v=244a87fd408bff07';
+import {safeURL} from './utils/validation.js?v=244a87fd408bff07';
+import {startRouter,route} from './router.js?v=244a87fd408bff07';
+import {renderHeader,renderNavigation} from './components/header.js?v=244a87fd408bff07';
+import {renderHome,renderCategorySections,sectionHeading} from './pages/home.js?v=244a87fd408bff07';
+import {renderSearch} from './components/search.js?v=244a87fd408bff07';
+import {renderLibrary} from './pages/library.js?v=244a87fd408bff07';
+import {renderAppDetails} from './pages/app-details.js?v=244a87fd408bff07';
+import {renderAppGrid} from './components/app-card.js?v=244a87fd408bff07';
+import {collections} from './data/collections.js?v=244a87fd408bff07';
+import {collectionApps,getApp} from './services/app-service.js?v=244a87fd408bff07';
+import {toggleBookmark,read} from './utils/storage.js?v=244a87fd408bff07';
+import {download} from './services/download-service.js?v=244a87fd408bff07';
 document.documentElement.style.setProperty('--accent',config.accent);
 function render(){try{const {parts,params}=route();const [page,id]=parts;const active=['home','games','apps','search','library'].includes(page)?page:['app','category','categories','collection'].includes(page)?'apps':'home';document.querySelector('#header').replaceChildren(renderHeader(active));document.querySelector('#navigation').replaceChildren(renderNavigation(active));let content;
  const opts={q:params.get('q')||'',category:params.get('category')||config.defaultCategory,sort:params.get('sort')||'name'};
@@ -20,4 +20,4 @@ function render(){try{const {parts,params}=route();const [page,id]=parts;const a
  }catch(e){console.error(e);document.querySelector('#main').replaceChildren(el('div',{class:'empty'},el('h1',{},'Something needs a refresh'),el('p',{},'The catalog could not be displayed. Please try reloading.'),el('button',{class:'button',onClick:()=>location.reload()},'Reload catalog')));}}
  document.addEventListener('click',e=>{if(e.target.closest('.skip')){e.preventDefault();document.querySelector('#main').focus();document.querySelector('#main').scrollIntoView();return;}const d=e.target.closest('[data-download]');if(d){e.preventDefault();download(d.dataset.download);return;}const b=e.target.closest('[data-save]');if(b){const saved=toggleBookmark(b.dataset.save);b.setAttribute('aria-pressed',String(saved));b.lastChild.textContent=saved?'Saved':'Save for later';toast(saved?'Saved to your library':'Removed from saved apps');}});
  function connection(){const node=document.querySelector('#connection');node.hidden=navigator.onLine;node.textContent='You’re offline. Cached catalog content is available; external downloads need a connection.';}window.addEventListener('online',connection);window.addEventListener('offline',connection);connection();startRouter(render);
- if('serviceWorker'in navigator){window.addEventListener('load',async()=>{try{const reg=await navigator.serviceWorker.register('./sw.js');function offer(worker){const host=document.querySelector('#connection');host.hidden=false;host.replaceChildren(el('span',{},'A fresh version is ready. '),el('button',{class:'text-button',onClick:()=>worker.postMessage('SKIP_WAITING')},'Update now'));}if(reg.waiting)offer(reg.waiting);reg.addEventListener('updatefound',()=>{const w=reg.installing;w?.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)offer(w);});});let refreshing=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!refreshing){refreshing=true;location.reload();}});}catch{console.info('Offline support unavailable; browsing remains usable.');}});}
+

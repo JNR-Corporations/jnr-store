@@ -1,4 +1,4 @@
-import {safeURL} from './validation.js';
+import {safeURL} from './validation.js?v=244a87fd408bff07';
 export function el(tag, attrs={}, ...children) {
  const node=document.createElement(tag);
  for(const [k,v] of Object.entries(attrs)) {if(v===null||v===undefined||v===false)continue;if(k==='class')node.className=v;else if(k.startsWith('on')&&typeof v==='function')node.addEventListener(k.slice(2).toLowerCase(),v);else node.setAttribute(k,v===true?'':String(v));}

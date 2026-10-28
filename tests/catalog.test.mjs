@@ -41,7 +41,7 @@ console.warn=warn;
 assert.deepEqual(validateApps([basic])[0].screenshots,[]);
 assert.equal(validateApps([{...basic,rating:99}])[0].rating,null);
 for(const a of apps)for(const asset of [a.icon,...a.screenshots,a.banner?.image].filter(Boolean))assert(fs.existsSync(path.join(root,asset)),asset);
-for(const file of fs.readdirSync(path.join(root,'js'),{recursive:true}).filter(f=>f.endsWith('.js'))){const full=path.join(root,'js',file);const source=fs.readFileSync(full,'utf8');for(const m of source.matchAll(/from\s+['"](\.[^'"]+)['"]/g))assert(fs.existsSync(path.resolve(path.dirname(full),m[1])),m[1]);assert(!source.includes('innerHTML'),file);}
+for(const file of fs.readdirSync(path.join(root,'js'),{recursive:true}).filter(f=>f.endsWith('.js'))){const full=path.join(root,'js',file);const source=fs.readFileSync(full,'utf8');for(const m of source.matchAll(/from\s+['"](\.[^'"]+)['"]/g))assert(fs.existsSync(path.resolve(path.dirname(full),m[1].split('?')[0])),m[1]);assert(!source.includes('innerHTML'),file);}
 const sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');const shell=JSON.parse(sw.match(/const SHELL=(\[[\s\S]*?\]);/)[1]);for(const file of shell)assert(fs.existsSync(path.resolve(root,file)),file);
 const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.webmanifest'),'utf8'));for(const i of manifest.icons)assert(fs.existsSync(path.join(root,i.src)));
 // Storage works both with persistent storage and blocked storage.
