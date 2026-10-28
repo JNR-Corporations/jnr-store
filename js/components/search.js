@@ -1,0 +1,18 @@
+import {el,link} from '../utils/dom.js';
+import {icon} from './icons.js';
+import {categories} from '../data/categories.js';
+import {read,remember} from '../utils/storage.js';
+import {searchApps} from '../services/app-service.js';
+import {renderAppGrid} from './app-card.js';
+export function renderSearchResults(results){return results.length?renderAppGrid(results):el('div',{class:'empty'},icon('search'),el('h2',{},'Nothing here just yet'),el('p',{},'Try another name, category, or a shorter search.'));}
+export function renderSearch({q='',category='',sort='name',type='',title='Discover something good'}={}){
+ const results=el('div',{'aria-live':'polite'}),count=el('p',{class:'result-count'}),suggestions=el('div',{class:'suggestions'}),recent=el('div',{class:'recent-searches'});
+ const input=el('input',{type:'search',value:q,placeholder:'Search apps, games, and possibilities…','aria-label':'Search catalog',autocomplete:'off'});
+ const categorySelect=el('select',{'aria-label':'Filter by category'},el('option',{value:''},'All categories'),categories.map(c=>el('option',{value:c.name},c.name)));categorySelect.value=category;
+ const sortSelect=el('select',{'aria-label':'Sort apps'},[['name','Name: A–Z'],['rating','Highest rated'],['added','Recently added'],['updated','Recently updated']].map(([v,t])=>el('option',{value:v},t)));sortSelect.value=sort;
+ const form=el('form',{class:'discovery-form',role:'search'},el('div',{class:'search-field'},icon('search'),input,el('button',{type:'button',class:'round-button','aria-label':'Clear search',onClick:()=>{input.value='';update();input.focus();}},icon('close'))),el('div',{class:'filter-row'},el('span',{},'Explore your way'),categorySelect,sortSelect));
+ function recentTerms(){recent.replaceChildren();const terms=read().searches.slice(0,6);if(terms.length){recent.append(el('span',{class:'muted'},'Recent searches'),...terms.map(t=>{const b=el('button',{type:'button',class:'chip',onClick:()=>{input.value=t;update();}},t);return b;}));}}
+ function update(){const query=input.value.trim();const items=searchApps({q:query,category:categorySelect.value,sort:sortSelect.value,type});count.textContent=`${items.length} ${items.length===1?'discovery':'discoveries'}${query?' for “'+query+'”':''}`;results.replaceChildren(renderSearchResults(items));suggestions.replaceChildren();if(query){for(const a of items.slice(0,4))suggestions.append(link(a.name,'#/app/'+a.id,'suggestion'));}const params=new URLSearchParams();if(query)params.set('q',query);if(categorySelect.value)params.set('category',categorySelect.value);if(sortSelect.value!=='name')params.set('sort',sortSelect.value);history.replaceState(null,'',location.pathname+location.search+'#/'+(type==='game'?'games':type==='app'?'apps':'search')+(params.size?'?'+params:''));}
+ let timer;input.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(update,120);});input.addEventListener('keydown',e=>{if(e.key==='ArrowDown'){const a=suggestions.querySelector('a');if(a){e.preventDefault();a.focus();}}if(e.key==='Escape'){suggestions.replaceChildren();input.blur();}});form.addEventListener('submit',e=>{e.preventDefault();clearTimeout(timer);remember('searches',input.value.trim());update();recentTerms();suggestions.replaceChildren();input.blur();});categorySelect.addEventListener('change',update);sortSelect.addEventListener('change',update);recentTerms();
+ const root=el('div',{},el('p',{class:'eyebrow'},type==='game'?'A LITTLE TIME TO PLAY':'A WORLD TO EXPLORE'),el('h1',{class:'page-title'},title),form,suggestions,recent,count,results);count.textContent=`${searchApps({q,category,sort,type}).length} discoveries`;results.append(renderSearchResults(searchApps({q,category,sort,type})));return root;
+}

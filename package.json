@@ -1,0 +1,1 @@
+{"name":"jnr-store","version":"1.0.0","private":true,"type":"module","scripts":{"test":"node tests/catalog.test.mjs && node tests/sw.test.mjs"}}

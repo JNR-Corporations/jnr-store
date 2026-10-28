@@ -1,0 +1,11 @@
+import vm from 'node:vm';import fs from 'node:fs';import assert from 'node:assert/strict';
+const listeners={};const cache=new Map();const deleted=[];let claimed=false,skipped=false,precache=[];const origin='https://store.test';
+const context={URL,location:{origin},self:{registration:{scope:origin+'/'},addEventListener:(n,fn)=>listeners[n]=fn,clients:{claim:async()=>{claimed=true;}},skipWaiting:()=>{skipped=true;}},caches:{open:async()=>({addAll:async list=>{precache=list;},put:async(req,res)=>cache.set(req.url||req,res)}),keys:async()=>['jnr-shell-v0','jnr-shell-v1','other-app'],delete:async k=>deleted.push(k),match:async req=>cache.get(req.url||req.href||req)},fetch:async()=>{throw Error('offline');}};
+vm.runInNewContext(fs.readFileSync(new URL('../sw.js',import.meta.url),'utf8'),context);
+let job;listeners.install({waitUntil:p=>job=p});await job;assert(precache.includes('index.html'));assert(!precache.some(p=>p.endsWith('.apk')));
+listeners.activate({waitUntil:p=>job=p});await job;assert(claimed);assert.deepEqual(deleted,['jnr-shell-v0']);listeners.message({data:'SKIP_WAITING'});assert(skipped);
+cache.set(origin+'/index.html',{shell:true});let response;
+listeners.fetch({request:{url:origin+'/app-route',method:'GET',mode:'navigate'},respondWith:p=>response=p});assert.equal((await response).shell,true);
+response=undefined;listeners.fetch({request:{url:'https://publisher.test/app.apk',method:'GET',mode:'cors'},respondWith:p=>response=p});assert.equal(response,undefined);
+listeners.fetch({request:{url:origin+'/app.apk',method:'GET',mode:'cors'},respondWith:p=>response=p});assert.equal(response,undefined);
+console.log('PASS: SW shell precache, old-cache cleanup, update activation, offline navigation fallback and external/APK exclusion (mocked lifecycle).');
