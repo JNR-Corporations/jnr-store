@@ -16,7 +16,7 @@ export const apps = [
     ],
     "shortDescription": "Documents, beautifully simple.",
     "description": "Documents, beautifully simple.\n\nDesigned around simple, thoughtful interactions, JNR PDFs is a fictional application included to demonstrate this catalog. Its interface illustrations, release notes and metadata are sample content. Replace this record with your own application before launch.\n\nExplore the screenshots, save this app to your library, and discover more apps in Productivity.",
-    "version": "1.0.0",
+    "version": "1.0.3",
     "size": "12 MB",
     "rating": null,
     "reviewCount": null,
@@ -32,7 +32,7 @@ export const apps = [
       "pdf",
       "sample"
     ],
-    "downloadUrl": "",
+    "downloadUrl": "https://jnr-pdfs.vercel.app/jnr_pdfs.apk",
     "alternateDownloads": [],
     "whatsNew": "Sample release: refreshed navigation and more accessible controls.",
     "androidRequirements": "Android 8.0+",
