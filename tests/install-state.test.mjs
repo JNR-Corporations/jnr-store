@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+const map=new Map();globalThis.localStorage={getItem:k=>map.get(k)||null,setItem:(k,v)=>map.set(k,v),removeItem:k=>map.delete(k)};
+globalThis.window=new EventTarget();const sent=[];
+const state=await import('../js/services/install-state.js');
+assert.equal(state.nativeAvailable(),false);assert.equal(state.nativeCommand('install',{id:'app'}),false);
+state.recordTransfer('one',{state:'received',progress:100});assert.equal(state.transfers()[0].state,'received');assert(!state.transfers().some(x=>x.state==='installed'));
+window.JNRNative={postMessage:value=>sent.push(JSON.parse(value))};assert(state.nativeAvailable());state.nativeCommand('install',{id:'one',downloadUrl:'https://host.test/a.apk',sha256:'ab'});assert.equal(sent[0].url,'https://host.test/a.apk');
+window.dispatchEvent(new CustomEvent('jnr:native-state',{detail:{id:'one',state:'awaiting_confirmation'}}));assert.equal(state.transfers()[0].state,'awaiting_confirmation');assert.equal(state.transfers()[0].native,true);
+window.dispatchEvent(new CustomEvent('jnr:native-state',{detail:{id:'one',state:'installed',packageName:'com.example.app'}}));assert.equal(state.transfers()[0].state,'installed');
+window.dispatchEvent(new CustomEvent('jnr:native-state',{detail:{id:'two',state:'fake-state'}}));assert.equal(state.transfers().length,1);
+state.clearTransfers();assert.equal(state.transfers().length,0);
+console.log('PASS: web save state remains distinct from installed; native message payloads, pending/success events, invalid states and clear history (mocked channel).');

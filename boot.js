@@ -6,7 +6,7 @@ try{current=await release();await import(new URL(current.entry,import.meta.url))
 async function check(){if(document.visibilityState!=='visible'||!navigator.onLine)return;try{const next=await release();if(current&&next.version!==current.version)refresh();}catch{}}
 window.addEventListener('online',check);document.addEventListener('visibilitychange',check);setInterval(check,60000);
 document.querySelector('#dialog')?.addEventListener('close',()=>{if(deferred)refresh();});
-if('serviceWorker'in navigator){
+if('serviceWorker'in navigator&&!window.JNRNative){
  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(navigator.serviceWorker.controller)check();});
  try{const reg=await navigator.serviceWorker.register(new URL('sw.js',import.meta.url),{updateViaCache:'none'});if(reg.waiting)reg.waiting.postMessage('SKIP_WAITING');reg.addEventListener('updatefound',()=>{const worker=reg.installing;worker?.addEventListener('statechange',()=>{if(worker.state==='installed'&&navigator.serviceWorker.controller)worker.postMessage('SKIP_WAITING');});});await reg.update();document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reg.update().catch(()=>{});});}catch{}
 }

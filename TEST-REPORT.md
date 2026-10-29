@@ -24,3 +24,11 @@
 Real Android hardware performance, native APK installation, CORS behavior of the user's actual provider and secure-origin worker migration were not verified in the HTTP preview. The user's failing publisher URL was not present in this checkout, so its host-side 404 is not diagnosed. Sample records still have no production download URLs. No Kotlin/native performance claim is made. Download animation uses actual transfer state; final filesystem save/installation is not observable by this app.
 
 Internal QA pages and fixtures were removed from the deliverable.
+
+## Version 3 — 29 October 2026
+
+Five JavaScript test suites passed, including the new mocked origin-channel state integration tests. Web saved-file status remains distinct from native installation results. Invalid native state messages are ignored; payloads, pending/success events, history clearing and existing cache-release tests pass. All application modules passed syntax checks. Android manifest/resource XML and Python launcher/sync scripts passed parsing checks.
+
+Browser QA: marketplace desktop render inspected; 390px home and 320px details layouts inspected with main content width equal to scrollWidth; details and gallery Next/Previous worked. App details explain browser/native install limits. Downloads center opens and correctly identifies browser mode. The extra screenshot/transfer states use real status, not fake completion percentages.
+
+Android Kotlin sources were reviewed but NOT compiled. No Android SDK, Gradle or device test was available. The PackageInstaller path, unknown-source permission round trip, user confirmation/result receiver, Open action, background/process-death behavior, compatibility and APK signature checks must be tested on an Android 8+ device before release. No compiled APK is included. The companion uses a bundled WebView UI with a Kotlin installer, not a Jetpack Compose rewrite. Existing device permissions and installed packages are not broadly enumerated.

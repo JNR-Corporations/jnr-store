@@ -1,6 +1,6 @@
 # JNR Store
 
-Version 2: a white-and-rose, Android-first app discovery web app by JNR Corporations. HTML, CSS and vanilla ES modules; no runtime dependencies, account or backend.
+Version 3: an Android-first app marketplace with white surfaces, rose accents and a separate Kotlin installer companion by JNR Corporations. HTML, CSS and vanilla ES modules; no runtime dependencies, account or backend.
 
 ## Run locally
 
@@ -74,3 +74,13 @@ Semantic headings, native dialogs with Escape/focus behavior, labeled search/fil
 ## Validation and limits
 
 Run `npm test` with Node.js 20+ for automated checks (no packages to install). See `TEST-REPORT.md` for checks performed. Browser installability, actual APK downloads, slow-device performance and platform-specific hosting require deployment testing. No account sync, backend reviews, malware verification, real download statistics or automatic installation. No verified publisher badges. Catalog content is sample data and all downloads start unavailable.
+
+## Version 3 features and native installation
+
+The source ZIP contains `jnr-store/` (this website) and sibling `android/` (Kotlin source plus a bundled copy of the website). Deploy only jnr-store to a static host. Open android/README.md for Android build instructions. The companion is source, not a tested/compiled APK; Android SDK/Gradle were not available during delivery.
+
+New in v3: marketplace search header, sticky discovery tabs, compact three-row app collections, redesigned details/buttons, keyboard-accessible screenshot viewer with Previous/Next, app sharing, permissions information and Downloads & Installs. Transfer percentages use real received bytes, while installer waiting uses an indeterminate animation. Browser file saves are not treated as installed apps. Native Installed/Open requires a successful PackageInstaller callback.
+
+`packageName` (expected Android package ID) and `sha256` (publisher APK digest, optional 64 hex characters) may be added to an app object alongside a real absolute HTTPS downloadUrl. The native companion downloads a standalone APK, checks the configured digest/package, asks contextually for unknown-source install access and submits it to Android's system installer for approval. A browser cannot grant Android native install permissions or silently install APKs. No Google Play affiliation, privileged/silent-install capability, fabricated ratings or automatic malware certification is claimed.
+
+Native source APIs: [PackageInstaller.Session](https://developer.android.com/reference/android/content/pm/PackageInstaller.Session) and [origin-aware WebView messaging](https://developer.android.com/develop/ui/views/layout/webapps/native-api-access-jsbridge). Download/installer states and their test limits are in TEST-REPORT.md.

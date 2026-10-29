@@ -1,6 +1,6 @@
-import {el,image,link} from '../utils/dom.js?v=244a87fd408bff07';
-import {icon} from './icons.js?v=244a87fd408bff07';
-import {resolveDownloadURL} from '../services/download-url.js?v=244a87fd408bff07';
+import {el,image,link} from '../utils/dom.js?v=7c0f1d9b2ad34129';
+import {icon} from './icons.js?v=7c0f1d9b2ad34129';
+import {resolveDownloadURL} from '../services/download-url.js?v=7c0f1d9b2ad34129';
 export function renderAppCard(a,layout='compact'){
  const meta=a.rating!==null?`${a.rating.toFixed(1)} ★ · ${a.category}`:a.category;
  const copy=el('div',{class:'card-copy'},el('h3',{},a.name),el('p',{},layout==='list'?a.shortDescription:meta),el('small',{},a.sample?'Sample app':a.downloadsLabel||a.developer||''));

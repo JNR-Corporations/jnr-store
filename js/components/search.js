@@ -1,10 +1,10 @@
-import {el,link} from '../utils/dom.js?v=244a87fd408bff07';
-import {icon} from './icons.js?v=244a87fd408bff07';
-import {resolveDownloadURL} from '../services/download-url.js?v=244a87fd408bff07';
-import {categories} from '../data/categories.js?v=244a87fd408bff07';
-import {read,remember} from '../utils/storage.js?v=244a87fd408bff07';
-import {searchApps} from '../services/app-service.js?v=244a87fd408bff07';
-import {renderAppGrid} from './app-card.js?v=244a87fd408bff07';
+import {el,link} from '../utils/dom.js?v=7c0f1d9b2ad34129';
+import {icon} from './icons.js?v=7c0f1d9b2ad34129';
+import {resolveDownloadURL} from '../services/download-url.js?v=7c0f1d9b2ad34129';
+import {categories} from '../data/categories.js?v=7c0f1d9b2ad34129';
+import {read,remember} from '../utils/storage.js?v=7c0f1d9b2ad34129';
+import {searchApps} from '../services/app-service.js?v=7c0f1d9b2ad34129';
+import {renderAppGrid} from './app-card.js?v=7c0f1d9b2ad34129';
 export function renderSearchResults(results){return results.length?renderAppGrid(results):el('div',{class:'empty'},icon('search'),el('h2',{},'Nothing here just yet'),el('p',{},'Try another name, category, or a shorter search.'));}
 export function renderSearch({q='',category='',sort='name',type='',title='Discover something good'}={}){
  const results=el('div',{'aria-live':'polite'}),count=el('p',{class:'result-count'}),suggestions=el('div',{class:'suggestions'}),recent=el('div',{class:'recent-searches'});

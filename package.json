@@ -1,10 +1,10 @@
 {
   "name": "jnr-store",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "release": "python3 tools/release.py",
-    "test": "node tests/catalog.test.mjs && node tests/sw.test.mjs && node tests/download.test.mjs && node tests/release.test.mjs"
+    "test": "node tests/catalog.test.mjs && node tests/sw.test.mjs && node tests/download.test.mjs && node tests/release.test.mjs && node tests/install-state.test.mjs"
   }
 }
